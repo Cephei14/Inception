@@ -17,7 +17,7 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
     # Wait for MariaDB to be ready
     echo "Waiting for MariaDB to start..."
     for i in $(seq 1 30); do
-        if mysqladmin ping --silent 2>/dev/n6'ull; then
+        if mysqladmin ping --silent 2>/dev/null; then
             break
         fi
         sleep 1
