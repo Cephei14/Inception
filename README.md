@@ -55,12 +55,19 @@ Before running the project, configure your domain name to point to localhost:
    ```
    Replace `<VM_IP>` with the IP address shown by `hostname -I` in your VM. Adjust the username and paths as needed for your environment.
 
-3. **Set up secrets** (if not already present):
+3. **Set up secrets and directories** (if not already present):
    ```bash
    # Secrets should already be in the secrets/ folder
    # Do not commit secrets to git
    ls secrets/
+   sudo chown -R $(whoami):$(whoami) ~/secrets
+   chmod 700 ~/secrets
+   chmod 600 ~/secrets/*
    # Should show: credentials.txt, db_password.txt, db_root_password.txt
+   mkdir -p /home/rdhaibi/data/mariadb
+   mkdir -p /home/rdhaibi/data/wordpress
+   sudo chown -R $(whoami):$(whoami) /home/rdhaibi/data
+   chmod 700 /home/rdhaibi/data/mariadb /home/rdhaibi/data/wordpress
    ```
 
 4. **Build and start the infrastructure**:
