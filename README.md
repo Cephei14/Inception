@@ -17,9 +17,9 @@ All services run in dedicated containers, communicate through a Docker network, 
 
 ### Prerequisites
 
-- Linux Virtual Machine (recommended: Debian or Ubuntu)
-- Docker Engine (version 20.10 or higher)
-- Docker Compose (version 1.29 or higher)
+- Linux Virtual Machine (e.g: Debian or Ubuntu)
+- Docker Engine
+- Docker Compose
 - `make` utility
 - At least 4GB of free disk space
 

@@ -293,7 +293,7 @@ Both directories should contain files.
 
 3. Check if ports are already in use:
    ```bash
-   sudo netstat -tulpn | grep -E ':(443|80)'
+   sudo ss -tulpn | grep -E ':(443|80)'
    ```
 
 4. Try a clean rebuild:
