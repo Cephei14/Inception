@@ -1,4 +1,3 @@
-
 secrets:
   db_password:
     file: ../secrets/db_password.txt
@@ -86,4 +85,3 @@ volumes:
 networks:
   inception_network:
     driver: bridge
-

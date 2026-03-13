@@ -18,7 +18,7 @@ The Inception project provides the following services:
 - **NGINX Web Server** (Port 443)
   - Serves as the entry point to the infrastructure
   - Provides HTTPS/TLS encryption (TLSv1.2/TLSv1.3)
-  - Redirects HTTP (port 80) to HTTPS (port 443)
+  - Port 80 is not exposed; only HTTPS on 443 is available
   
 - **WordPress Content Management System**
   - Full-featured blogging and website platform
@@ -53,7 +53,7 @@ make up
 ```
 
 This command will:
-1. Create necessary data directories (`/home/cepheus/data/`)
+1. Create necessary data directories (`/home/rdhaibi/data/`)
 2. Start all three containers (MariaDB → WordPress → NGINX)
 3. Run in detached mode (background)
 
@@ -135,10 +135,12 @@ This will:
 
 The infrastructure comes with two predefined users:
 
-| Username | Role | Email | Purpose |
-|----------|------|-------|---------|
-| `rdhaibi` | Administrator | rdhaibi@student.42.fr | Full site management |
-| `wpregular` | Author | wpuser@student.42.fr | Content creation |
+ _____________________________________________________________________________
+| Username    | 	Role	   | 		Email		   |      Purpose   	  |
+|-------------|----------------|-----------------------|----------------------|
+| `rdhaibi`   | Administrator  | rdhaibi@student.42.fr | Full site management |
+| `wpregular` | 	Author     | wpuser@student.42.fr  |   Content creation   |
+|_____________|________________|_______________________|______________________|
 
 ## Managing Credentials
 
@@ -207,7 +209,7 @@ docker ps
 **Expected output**:
 ```
 CONTAINER ID   IMAGE                  STATUS          PORTS                           NAMES
-abc123...      nginx:inception        Up 2 minutes    0.0.0.0:80->80/tcp, 443->443    nginx
+abc123...      nginx:inception        Up 2 minutes    0.0.0.0:443->443/tcp    nginx
 def456...      wordpress:inception    Up 2 minutes    9000/tcp                        wordpress
 ghi789...      mariadb:inception      Up 3 minutes    3306/tcp                        mariadb
 ```
@@ -251,8 +253,8 @@ Should show the WordPress database.
 
 **Test WordPress installation**:
 ```bash
-docker exec wordpress wp core is-installed --allow-root
-echo $?  # Should output: 0 (success)
+docker exec -w /var/www/html wordpress wp core is-installed --allow-root
+echo $?  #output: 0 (success)
 ```
 
 ### Volume Status
@@ -264,8 +266,8 @@ docker volume ls
 
 **Check data on host**:
 ```bash
-ls -lh /home/cepheus/data/mariadb/
-ls -lh /home/cepheus/data/wordpress/
+ls -lh /home/rdhaibi/data/mariadb/
+ls -lh /home/rdhaibi/data/wordpress/
 ```
 
 Both directories should contain files.
@@ -349,7 +351,7 @@ Both directories should contain files.
 
 2. Check host data directories:
    ```bash
-   ls -la /home/cepheus/data/wordpress/
+   ls -la /home/rdhaibi/data/wordpress/
    ```
 
 3. Verify volume mounts in containers:
