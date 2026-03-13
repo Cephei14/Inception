@@ -188,7 +188,7 @@ WP_USER_PASSWORD=RegularUser123        # Regular user password
 
 2. **Edit the `.env` file**:
    ```bash
-   nano srcs/.env
+   vim srcs/.env
    ```
 
 3. **Clean and rebuild**:
@@ -209,7 +209,7 @@ docker ps
 **Expected output**:
 ```
 CONTAINER ID   IMAGE                  STATUS          PORTS                           NAMES
-abc123...      nginx:inception        Up 2 minutes    0.0.0.0:443->443/tcp    nginx
+abc123...      nginx:inception        Up 2 minutes    0.0.0.0:443->443/tcp  		  nginx
 def456...      wordpress:inception    Up 2 minutes    9000/tcp                        wordpress
 ghi789...      mariadb:inception      Up 3 minutes    3306/tcp                        mariadb
 ```
