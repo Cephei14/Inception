@@ -12,8 +12,8 @@ help:
 	@echo "  make data-dirs   - Create data directories"
 
 data-dirs:
-	@mkdir -p /home/cepheus/data/mariadb
-	@mkdir -p /home/cepheus/data/wordpress
+	@mkdir -p /home/rdhaibi/data/mariadb
+	@mkdir -p /home/rdhaibi/data/wordpress
 	@echo "Data directories created"
 
 build: data-dirs
@@ -33,7 +33,7 @@ clean: down
 
 fclean: clean
 	@docker rmi -f mariadb:inception wordpress:inception nginx:inception 2>/dev/null || true
-	@sudo rm -rf /home/cepheus/data/mariadb/* /home/cepheus/data/wordpress/*
+	@sudo rm -rf /home/rdhaibi/data/mariadb/* /home/rdhaibi/data/wordpress/*
 	@echo "Full clean completed"
 
 re: fclean build up
