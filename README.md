@@ -44,8 +44,18 @@ Before running the project, configure your domain name to point to localhost:
    git clone <repository-url>
    cd inception
    ```
+   
+2. **Copy the repository to the VM**:
+   ```bash
+   scp -P 2222 -r /home/rdhaibi/Desktop/Inception rdhaibi@localhost:/home/rdhaibi
+   ```
+   This command assumes your VM is configured with NAT and port forwarding (host port 2222 → guest port 22), general rule :
+   ```bash
+   scp -r /home/rdhaibi/Desktop/Inception rdhaibi@<VM_IP>:/home/rdhaibi
+   ```
+   Replace `<VM_IP>` with the IP address shown by `hostname -I` in your VM. Adjust the username and paths as needed for your environment.
 
-2. **Set up secrets** (if not already present):
+3. **Set up secrets** (if not already present):
    ```bash
    # Secrets should already be in the secrets/ folder
    # Do not commit secrets to git
@@ -53,13 +63,13 @@ Before running the project, configure your domain name to point to localhost:
    # Should show: credentials.txt, db_password.txt, db_root_password.txt
    ```
 
-3. **Build and start the infrastructure**:
+4. **Build and start the infrastructure**:
    ```bash
    make build    # Build all Docker images
    make up       # Start all services
    ```
 
-4. **Access the website**:
+5. **Access the website**:
    - Open your browser and navigate to: `https://rdhaibi.42.fr`
    - Accept the self-signed certificate warning
    - WordPress should be accessible
