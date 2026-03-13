@@ -163,7 +163,7 @@ This project uses Docker to containerize three main services: NGINX, WordPress, 
 
 ### Secrets vs Environment Variables
  ____________________________________________________________________________________
-| 	   Aspect      |   	          Secrets 		       | Environment Variables       |
+| 	   Aspect      |   	          Secrets 		       | 	Environment Variables    |
 |------------------|-----------------------------------|-----------------------------|
 | **Security**     | Encrypted, restricted access      | Plaintext in container      |
 | **Visibility**   | Not in logs/inspect               | Visible in `docker inspect` |
@@ -187,7 +187,7 @@ This project uses Docker to containerize three main services: NGINX, WordPress, 
 | **Use Case**     | Microservices, security 		| High performance needs 	 |
 |__________________|________________________________|____________________________|
 
-**Choice for this project**: Custom bridge network (`inception_network`) provides service discovery (containers can reach each other by name), isolation from host, and security - perfect for our multi-service setup.
+**Choice for this project**: A custom bridge network (`inception_network`) allows containers to communicate with each other by name and provides network isolation between containers. Host access to services (like HTTPS and SSH) is enabled only through explicit port forwarding (e.g., 4443→443 for HTTPS, 2222→22 for SSH) using NAT. This setup is secure and flexible for a multi-service environment, exposing only selected ports to the host.
 
 ### Docker Volumes vs Bind Mounts
  ___________________________________________________________________________________________
@@ -201,7 +201,7 @@ This project uses Docker to containerize three main services: NGINX, WordPress, 
 | **Best For**    | Production, persistence 				 | Development, sharing files 	|
 |_________________|__________________________________________|______________________________|
 
-**Implementation**: This project uses **named volumes with driver options** to store data in `/home/cepheus/data/` as required, combining the benefits of Docker volume management with specific host locations.
+**Implementation**: This project uses **named volumes with driver options** to store data in `/home/rdhaibi/data/` as required, combining the benefits of Docker volume management with specific host locations.
 
 ## Project Structure
 

@@ -22,17 +22,16 @@ This document provides technical information for developers who want to understa
 Install the required software on your system:
 
 ```bash
-# Update system packages
-sudo apt update && sudo apt upgrade -y
+# Update system packages and other necessary tools
+sudo apt update && sudo apt-get install -y ca-certificates curl gnupg sudo git make
 
-# Install Docker
-curl -fsSL https://get.docker.com -o get-docker.sh
+# Install Docker and other tools
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc && chmod a+r /etc/apt/keyrings/docker.asc
+apt-get update && apt-get install -y docker-compose docker-ce docker-ce-cli containerd.io docker-compose-plugin docker-buildx-plugin
+sudo curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose && sudo chmod +x /usr/local/bin/docker-compose
 sudo sh get-docker.sh
-sudo usermod -aG docker $USER
-newgrp docker
-
-# Install Docker Compose
-sudo apt install docker-compose -y
+sudo usermod -aG docker rdhaibi
 
 # Verify installations
 docker --version
@@ -56,9 +55,10 @@ Create credential files in the `secrets/` directory:
 
 ```bash
 # These files should NOT be committed to git
-echo "admin_credentials_here" > secrets/credentials.txt
-echo "database_password" > secrets/db_password.txt
-echo "root_password" > secrets/db_root_password.txt
+mkdir -p ~/secrets
+echo "Banana" > ~/secrets/db_password.txt
+echo "BananaMARIA" > ~/secrets/db_root_password.txt
+printf "WP_ADMIN_PASSWORD=BananaWP\nWP_USER_PASSWORD=RegularUser123\n" > ~/secrets/credentials.txt
 
 # Set appropriate permissions
 chmod 600 secrets/*
@@ -69,7 +69,18 @@ chmod 600 secrets/*
 Edit `srcs/.env` with your configuration:
 
 ```bash
-nano srcs/.env
+cat > ~/srcs/.env << 'EOF'
+DOMAIN_NAME=rdhaibi.42.fr
+MYSQL_DATABASE=wordpress_db
+MYSQL_USER=wordpress
+WP_ADMIN_USER=rdhaibi
+WP_ADMIN_EMAIL=rdhaibi@student.42.fr
+WP_DB_HOST=mariadb
+WP_DB_NAME=wordpress_db
+WP_DB_USER=wordpress
+WP_USER=wpregular
+WP_USER_EMAIL=wpuser@student.42.fr
+EOF
 ```
 
 **Required variables**:
@@ -109,11 +120,11 @@ sudo sh -c 'echo "127.0.0.1    rdhaibi.42.fr" >> /etc/hosts'
 │  └───────┼──────────────┼─────────────┼───────┘ │
 │          ↓              ↓             ↓         │
 │    ┌─────────┐   ┌──────────┐  ┌──────────┐     │
-│    │Port 443 │   │ wordpress│  │ mariadb  │     │
-│    │Port 80  │   │  volume  │  │  volume  │     │
+│    │  Port   │   │ wordpress│  │ mariadb  │     │
+│    │	443    │   │  volume  │  │  volume  │     │
 │    └─────────┘   └──────────┘  └──────────┘     │
 │                        ↓             ↓          │
-│                  /home/cepheus/data/            │
+│                  /home/rdhaibi/data/            │
 └─────────────────────────────────────────────────┘
 ```
 
@@ -253,7 +264,7 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /home/cepheus/data/mariadb
+      device: /home/rdhaibi/data/mariadb
 ```
 
 This provides:
@@ -272,12 +283,12 @@ docker volume inspect srcs_mariadb_data
 docker volume inspect srcs_wordpress_data
 
 # Check data on host
-ls -lah /home/cepheus/data/mariadb/
-ls -lah /home/cepheus/data/wordpress/
+ls -lah /home/rdhaibi/data/mariadb/
+ls -lah /home/rdhaibi/data/wordpress/
 
 # Backup volumes
-sudo tar -czf mariadb_backup.tar.gz /home/cepheus/data/mariadb/
-sudo tar -czf wordpress_backup.tar.gz /home/cepheus/data/wordpress/
+sudo tar -czf mariadb_backup.tar.gz /home/rdhaibi/data/mariadb/
+sudo tar -czf wordpress_backup.tar.gz /home/rdhaibi/data/wordpress/
 
 # Restore volumes (when containers are stopped)
 sudo tar -xzf mariadb_backup.tar.gz -C /
@@ -288,12 +299,9 @@ sudo tar -xzf wordpress_backup.tar.gz -C /
 
 ```bash
 # Check ownership
-ls -ld /home/cepheus/data/mariadb/
-ls -ld /home/cepheus/data/wordpress/
+ls -ld /home/rdhaibi/data/mariadb/
+ls -ld /home/rdhaibi/data/wordpress/
 
-# Fix permissions if needed (careful!)
-sudo chown -R 999:999 /home/cepheus/data/mariadb/    # mysql user
-sudo chown -R 33:33 /home/cepheus/data/wordpress/    # www-data user
 ```
 
 ## Network Configuration
@@ -326,11 +334,9 @@ docker exec nginx curl http://wordpress:9000
 
 ### Port Mapping
 
-- **NGINX**: 
-  - Host port 80 → Container port 80 (HTTP redirect)
-  - Host port 443 → Container port 443 (HTTPS)
-- **WordPress**: Port 9000 (internal only, not exposed to host)
-- **MariaDB**: Port 3306 (internal only, not exposed to host)
+**NGINX**: Host port 443 → Container port 443 (HTTPS only; port 80 is not exposed)
+**WordPress**: Port 9000 (internal only, not exposed to host)
+**MariaDB**: Port 3306 (internal only, not exposed to host)
 
 ## Configuration Files
 
@@ -504,7 +510,7 @@ docker exec wordpress ls -la /var/www/html
 docker exec mariadb ls -la /var/lib/mysql
 
 # Check host directories
-ls -la /home/cepheus/data/
+ls -la /home/rdhaibi/data/
 
 # Fix if needed (example for WordPress)
 docker exec wordpress chown -R www-data:www-data /var/www/html
