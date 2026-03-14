@@ -51,7 +51,7 @@ Before running the project, configure your domain name to point to localhost:
    ```
    This command assumes your VM is configured with NAT and port forwarding (host port 2222 → guest port 22), general rule :
    ```bash
-   scp -r /home/rdhaibi/Desktop/Inception rdhaibi@<VM_IP>:/home/rdhaibi
+   scp -r <Path of repository> rdhaibi@<VM_IP>:<destination>
    ```
    Replace `<VM_IP>` with the IP address shown by `hostname -I` in your VM. Adjust the username and paths as needed for your environment.
 
