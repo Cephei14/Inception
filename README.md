@@ -60,9 +60,9 @@ Before running the project, configure your domain name to point to localhost:
    # Secrets should already be in the secrets/ folder
    # Do not commit secrets to git
    ls secrets/
-   sudo chown -R $(whoami):$(whoami) ~/secrets
-   chmod 700 ~/secrets
-   chmod 600 ~/secrets/*
+   sudo chown -R $(whoami):$(whoami) secrets
+   chmod 700 secrets
+   chmod 600 secrets/*
    # Should show: credentials.txt, db_password.txt, db_root_password.txt
    mkdir -p /home/rdhaibi/data/mariadb
    mkdir -p /home/rdhaibi/data/wordpress
