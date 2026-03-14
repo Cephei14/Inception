@@ -70,13 +70,30 @@ Before running the project, configure your domain name to point to localhost:
    chmod 700 /home/rdhaibi/data/mariadb /home/rdhaibi/data/wordpress
    ```
 
-4. **Build and start the infrastructure**:
+4. **Set up .env**:
+
+	```bash
+	cat > srcs/.env << 'EOF'
+	DOMAIN_NAME=rdhaibi.42.fr
+	MYSQL_DATABASE=wordpress_db
+	MYSQL_USER=wordpress
+	WP_ADMIN_USER=rdhaibi
+	WP_ADMIN_EMAIL=rdhaibi@student.42.fr
+	WP_DB_HOST=mariadb
+	WP_DB_NAME=wordpress_db
+	WP_DB_USER=wordpress
+	WP_USER=wpregular
+	WP_USER_EMAIL=wpuser@student.42.fr
+	EOF
+	```
+
+5. **Build and start the infrastructure**:
    ```bash
    make build    # Build all Docker images
    make up       # Start all services
    ```
 
-5. **Access the website**:
+6. **Access the website**:
    - Open your browser and navigate to: `https://rdhaibi.42.fr`
    - Accept the self-signed certificate warning
    - WordPress should be accessible
