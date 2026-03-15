@@ -121,6 +121,8 @@ This will:
 
 4. **You should see the WordPress homepage**
 
+5. **Login as a regular user**: `https://rdhaibi.42.fr/wp-login.php`
+
 ### Accessing the WordPress Admin Panel
 
 1. **Navigate to**: `https://rdhaibi.42.fr/wp-admin`
@@ -136,10 +138,10 @@ This will:
 The infrastructure comes with two predefined users:
 
  _____________________________________________________________________________
-| Username    | 	Role	   | 		Email		   |      Purpose   	  |
+| Username    | 	Role	       | 		Email    		 |      Purpose   	   |
 |-------------|----------------|-----------------------|----------------------|
 | `rdhaibi`   | Administrator  | rdhaibi@student.42.fr | Full site management |
-| `wpregular` | 	Author     | wpuser@student.42.fr  |   Content creation   |
+| `wpregular` | 	Author       | wpuser@student.42.fr  |   Content creation   |
 |_____________|________________|_______________________|______________________|
 
 ## Managing Credentials
@@ -209,7 +211,7 @@ docker ps
 **Expected output**:
 ```
 CONTAINER ID   IMAGE                  STATUS          PORTS                           NAMES
-abc123...      nginx:inception        Up 2 minutes    0.0.0.0:443->443/tcp  		  nginx
+abc123...      nginx:inception        Up 2 minutes    0.0.0.0:443->443/tcp  		     nginx
 def456...      wordpress:inception    Up 2 minutes    9000/tcp                        wordpress
 ghi789...      mariadb:inception      Up 3 minutes    3306/tcp                        mariadb
 ```
@@ -421,17 +423,17 @@ If you encounter issues not covered here:
 
 ## Summary of Common Commands
 
-| Task | Command |
-|------|---------|
-| Start services | `make up` |
-| Stop services | `make down` |
-| View logs | `make logs` |
-| Full cleanup | `make fclean` |
-| Rebuild | `make re` |
-| Check status | `docker ps` |
-| Test website | `curl -k https://rdhaibi.42.fr` |
-| Access admin | `https://rdhaibi.42.fr/wp-admin` |
-
----
+ ___________________________________________________
+|        Task    |            Command               |
+|----------------|----------------------------------|
+| Start services | `make up`                        |
+| Stop services  | `make down`                      |
+| View logs      | `make logs`                      |
+| Full cleanup   | `make fclean`                    |
+| Rebuild        | `make re`                        |
+| Check status   | `docker ps`                      |
+| Test website   | `curl -k https://rdhaibi.42.fr`  |
+| Access admin   | `https://rdhaibi.42.fr/wp-admin` |
+|________________|__________________________________|
 
 **For development and technical details, see [DEV_DOC.md](DEV_DOC.md).**

@@ -47,7 +47,7 @@ Before running the project, configure your domain name to point to localhost:
    
 2. **Copy the repository to the VM**:
    ```bash
-   scp -P 2222 -r /home/rdhaibi/Desktop/Inception rdhaibi@localhost:/home/rdhaibi
+   scp -P 2222 -r /home/rdhaibi/Inception rdhaibi@localhost:/home/rdhaibi/Desktop
    ```
    This command assumes your VM is configured with NAT and port forwarding (host port 2222 → guest port 22), general rule :
    ```bash
@@ -55,45 +55,45 @@ Before running the project, configure your domain name to point to localhost:
    ```
    Replace `<VM_IP>` with the IP address shown by `hostname -I` in your VM. Adjust the username and paths as needed for your environment.
 
-3. **Set up secrets and directories** (if not already present):
+3. **Set up secrets, env and directories** (if not already present):
    ```bash
    # Secrets should already be in the secrets/ folder
    # Do not commit secrets to git
-   ls secrets/
+   mkdir -p secrets
    sudo chown -R $(whoami):$(whoami) secrets
    chmod 700 secrets
-   chmod 600 secrets/*
+   echo "Banana" > secrets/db_password.txt
+   echo "BananaMARIA" > secrets/db_root_password.txt
+   printf "WP_ADMIN_PASSWORD=BananaWP\nWP_USER_PASSWORD=RegularUser123\n" > secrets/credentials.txt
+   ls secrets/
    # Should show: credentials.txt, db_password.txt, db_root_password.txt
-   mkdir -p /home/rdhaibi/data/mariadb
-   mkdir -p /home/rdhaibi/data/wordpress
-   sudo chown -R $(whoami):$(whoami) /home/rdhaibi/data
+   chmod 600 secrets/*
+   chown -R $(whoami):$(whoami) /home/rdhaibi/data
    chmod 700 /home/rdhaibi/data/mariadb /home/rdhaibi/data/wordpress
+   cd srcs
+   cat > .env << 'EOF'
+   DOMAIN_NAME=rdhaibi.42.fr
+   MYSQL_DATABASE=wordpress_db
+   MYSQL_USER=wordpress
+   WP_ADMIN_USER=rdhaibi
+   WP_ADMIN_EMAIL=rdhaibi@student.42.fr
+   WP_DB_HOST=mariadb
+   WP_DB_NAME=wordpress_db
+   WP_DB_USER=wordpress
+   WP_USER=wpregular
+   WP_USER_EMAIL=wpuser@student.42.fr
+   EOF
+   chown $(whoami):$(whoami) srcs/.env
    ```
 
-4. **Set up .env**:
 
-	```bash
-	cat > srcs/.env << 'EOF'
-	DOMAIN_NAME=rdhaibi.42.fr
-	MYSQL_DATABASE=wordpress_db
-	MYSQL_USER=wordpress
-	WP_ADMIN_USER=rdhaibi
-	WP_ADMIN_EMAIL=rdhaibi@student.42.fr
-	WP_DB_HOST=mariadb
-	WP_DB_NAME=wordpress_db
-	WP_DB_USER=wordpress
-	WP_USER=wpregular
-	WP_USER_EMAIL=wpuser@student.42.fr
-	EOF
-	```
-
-5. **Build and start the infrastructure**:
+4. **Build and start the infrastructure**:
    ```bash
    make build    # Build all Docker images
    make up       # Start all services
    ```
 
-6. **Access the website**:
+5. **Access the website**:
    - Open your browser and navigate to: `https://rdhaibi.42.fr`
    - Accept the self-signed certificate warning
    - WordPress should be accessible
@@ -172,14 +172,14 @@ This project uses Docker to containerize three main services: NGINX, WordPress, 
 
 ### Virtual Machines vs Docker
  __________________________________________________________________________________________
-| 		Aspect       | 			Virtual Machines 		 | 		Docker Containers 		   |
+| 		Aspect         | 			Virtual Machines 		      | 		Docker Containers 		    |
 |--------------------|-----------------------------------|---------------------------------|
-| **Architecture**   | Full OS with kernel      		 | Shares host kernel 			   |
-| **Size**           | GBs (entire OS)          		 | MBs (app + dependencies) 	   |
-| **Startup Time**   | Minutes                  		 | Seconds 						   |
-| **Resource Usage** | Heavy (pre-allocated)    		 | Light (dynamic)  			   |
-| **Isolation**      | Complete (hardware-level)   		 | Process-level 				   |
-| **Portability**    | Lower (platform-dependent)        | Higher (runs anywhere)  		   |
+| **Architecture**   | Full OS with kernel      	   	| Shares host kernel 			    |
+| **Size**           | GBs (entire OS)          		   | MBs (app + dependencies) 	    |
+| **Startup Time**   | Minutes                  		   | Seconds 						       |
+| **Resource Usage** | Heavy (pre-allocated)    		   | Light (dynamic)  			       |
+| **Isolation**      | Complete (hardware-level)   		| Process-level 				       |
+| **Portability**    | Lower (platform-dependent)        | Higher (runs anywhere)  	  	    |
 | **Use Case**       | Full OS testing, strong isolation | Microservices, rapid deployment |
 |____________________|___________________________________|_________________________________|
 
@@ -187,7 +187,7 @@ This project uses Docker to containerize three main services: NGINX, WordPress, 
 
 ### Secrets vs Environment Variables
  ____________________________________________________________________________________
-| 	   Aspect      |   	          Secrets 		       | 	Environment Variables    |
+| 	   Aspect       |   	          Secrets 		       | 	Environment Variables    |
 |------------------|-----------------------------------|-----------------------------|
 | **Security**     | Encrypted, restricted access      | Plaintext in container      |
 | **Visibility**   | Not in logs/inspect               | Visible in `docker inspect` |
@@ -201,28 +201,28 @@ This project uses Docker to containerize three main services: NGINX, WordPress, 
 ### Docker Network vs Host Network
 
  ________________________________________________________________________________
-|		 Aspect	   |	 Docker Network (Bridge)	| 		Host Network 		 |
+|		 Aspect	    |	 Docker Network (Bridge)	    | 		Host Network 		   |
 |------------------|--------------------------------|----------------------------|
 | **Isolation**    | Containers isolated from host  | Direct host network access |
 | **Port Mapping** | Explicit port mapping required | Automatic host port usage  |
-| **Security**     | Better (isolated) 				| Lower (direct exposure)	 |
-| **DNS**          | Built-in service discovery 	| Requires external DNS 	 |
-| **Performance**  | Slight overhead (NAT) 			| No overhead 				 |
-| **Use Case**     | Microservices, security 		| High performance needs 	 |
+| **Security**     | Better (isolated) 				 | Lower (direct exposure)	   |
+| **DNS**          | Built-in service discovery 	 | Requires external DNS 	   |
+| **Performance**  | Slight overhead (NAT) 			 | No overhead 				   |
+| **Use Case**     | Microservices, security 		 | High performance needs 	   |
 |__________________|________________________________|____________________________|
 
 **Choice for this project**: A custom bridge network (`inception_network`) allows containers to communicate with each other by name and provides network isolation between containers. Host access to services (like HTTPS and SSH) is enabled only through explicit port forwarding (e.g., 4443→443 for HTTPS, 2222→22 for SSH) using NAT. This setup is secure and flexible for a multi-service environment, exposing only selected ports to the host.
 
 ### Docker Volumes vs Bind Mounts
  ___________________________________________________________________________________________
-| 		Aspect	  | 			Docker Volumes				 |		 Bind Mounts			|
+| 		Aspect	   | 			Docker Volumes				          |		 Bind Mounts			     |
 |-----------------|------------------------------------------|------------------------------|
-| **Management**  | Docker-managed							 | User-managed 				|
-| **Location**    | Docker area (`/var/lib/docker/volumes/`) | Any host path 				|
-| **Portability** | Portable across systems 				 | Path-dependent 				|
-| **Permissions** | Docker handles 							 | Host filesystem permissions  |
-| **Backup**      | Docker tools available 					 | Manual/standard tools 		|
-| **Best For**    | Production, persistence 				 | Development, sharing files 	|
+| **Management**  | Docker-managed							       | User-managed 				     |
+| **Location**    | Docker area (`/var/lib/docker/volumes/`) | Any host path 				     |
+| **Portability** | Portable across systems 				       | Path-dependent 				  |
+| **Permissions** | Docker handles 							       | Host filesystem permissions  |
+| **Backup**      | Docker tools available 					    | Manual/standard tools 		  |
+| **Best For**    | Production, persistence 				       | Development, sharing files   |
 |_________________|__________________________________________|______________________________|
 
 **Implementation**: This project uses **named volumes with driver options** to store data in `/home/rdhaibi/data/` as required, combining the benefits of Docker volume management with specific host locations.

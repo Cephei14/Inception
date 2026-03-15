@@ -1,0 +1,5 @@
+srcs/.env
+secrets/
+.DS_Store
+.vscode/
+*.pdf

@@ -55,9 +55,9 @@ Create credential files in the `secrets/` directory:
 
 ```bash
 # These files should NOT be committed to git
-mkdir -p ~/secrets
-echo "Banana" > ~/secrets/db_password.txt
-echo "BananaMARIA" > ~/secrets/db_root_password.txt
+mkdir -p /secrets
+echo "Banana" > /secrets/db_password.txt
+echo "BananaMARIA" > /secrets/db_root_password.txt
 printf "WP_ADMIN_PASSWORD=BananaWP\nWP_USER_PASSWORD=RegularUser123\n" > ~/secrets/credentials.txt
 
 # Set appropriate permissions
@@ -69,7 +69,7 @@ chmod 600 secrets/*
 Edit `srcs/.env` with your configuration:
 
 ```bash
-cat > ~/srcs/.env << 'EOF'
+cat > /srcs/.env << 'EOF'
 DOMAIN_NAME=rdhaibi.42.fr
 MYSQL_DATABASE=wordpress_db
 MYSQL_USER=wordpress
@@ -221,6 +221,15 @@ docker exec -it mariadb bash
 docker exec -it wordpress bash
 docker exec -it nginx bash
 
+# List WordPress Users (inside wordpress's bash)
+wp user list --allow-root
+# Filter for WordPress admins
+wp user list --role=administrator --allow-root
+
+# Login as a root in MariaDB (inside mariadb's bash)
+mysql -u root -p
+SHOW DATABASES;
+
 # Run single command
 docker exec mariadb mysql -u root -p
 docker exec wordpress wp --info --allow-root
@@ -290,6 +299,10 @@ ls -lah /home/rdhaibi/data/wordpress/
 sudo tar -czf mariadb_backup.tar.gz /home/rdhaibi/data/mariadb/
 sudo tar -czf wordpress_backup.tar.gz /home/rdhaibi/data/wordpress/
 
+# Volume paths
+docker volume inspect $(docker volume ls -q -f name=mariadb)
+docker volume inspect $(docker volume ls -q -f name=wordpress)
+
 # Restore volumes (when containers are stopped)
 sudo tar -xzf mariadb_backup.tar.gz -C /
 sudo tar -xzf wordpress_backup.tar.gz -C /
@@ -318,6 +331,9 @@ docker network inspect srcs_inception_network
 # View DNS resolution
 docker exec wordpress nslookup mariadb
 docker exec nginx nslookup wordpress
+
+# Check TLS version
+echo | openssl s_client -connect rdhaibi.42.fr:443 2>/dev/null | grep -E "Protocol|TLS"
 ```
 
 ### Inter-Container Communication
@@ -383,6 +399,15 @@ Key settings:
 **Checking configuration**:
 ```bash
 docker exec mariadb mysqld --help --verbose | grep -A 1 "Default options"
+# Root login without password FAILS
+docker exec mariadb mysql -u root -e "SELECT 1"
+
+# User login with password SUCCEEDS
+docker exec mariadb mysql -u wordpress -pBanana -h 127.0.0.1 wordpress_db -e "SHOW TABLES;"
+
+# Login as root WITH password to check what users exist
+docker exec mariadb mysql -u root -p'BananaMARIA' -e "SELECT user,host FROM mysql.user;"
+
 ```
 
 ### Docker Compose Configuration
@@ -390,6 +415,7 @@ docker exec mariadb mysqld --help --verbose | grep -A 1 "Default options"
 **Location**: `srcs/docker-compose.yml`
 
 Defines:
+
 - Service build contexts and Dockerfiles
 - Environment variables from `.env`
 - Volume mounts
