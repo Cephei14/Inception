@@ -40,7 +40,7 @@ Before starting, ensure:
 1. You have Docker and Docker Compose installed
 2. Your domain name is configured in `/etc/hosts`:
    ```bash
-   127.0.0.1    rdhaibi.42.fr
+   127.0.0.1    login.42.fr
    ```
 3. You are in the project root directory
 
@@ -53,7 +53,7 @@ make up
 ```
 
 This command will:
-1. Create necessary data directories (`/home/rdhaibi/data/`)
+1. Create necessary data directories (`/home/login/data/`)
 2. Start all three containers (MariaDB → WordPress → NGINX)
 3. Run in detached mode (background)
 
@@ -112,24 +112,24 @@ This will:
 
 1. **Open your web browser**
 
-2. **Navigate to**: `https://rdhaibi.42.fr`
+2. **Navigate to**: `https://login.42.fr`
 
 3. **Accept the security warning**:
    - The website uses a self-signed SSL certificate
-   - Click "Advanced" → "Proceed to rdhaibi.42.fr" (Chrome)
+   - Click "Advanced" → "Proceed to login.42.fr" (Chrome)
    - Or "Accept the Risk and Continue" (Firefox)
 
 4. **You should see the WordPress homepage**
 
-5. **Login as a regular user**: `https://rdhaibi.42.fr/wp-login.php`
+5. **Login as a regular user**: `https://login.42.fr/wp-login.php`
 
 ### Accessing the WordPress Admin Panel
 
-1. **Navigate to**: `https://rdhaibi.42.fr/wp-admin`
+1. **Navigate to**: `https://login.42.fr/wp-admin`
 
 2. **Login credentials** (from `.env` file):
-   - Username: `rdhaibi` (admin user)
-   - Password: `BananaWP`
+   - Username: `login` (admin user)
+   - Password: `PswrdWP`
 
 3. **Admin Dashboard**: Full control over website settings, themes, plugins, users, etc.
 
@@ -140,7 +140,7 @@ The infrastructure comes with two predefined users:
  _____________________________________________________________________________
 | Username    | 	Role	       | 		Email    		 |      Purpose   	   |
 |-------------|----------------|-----------------------|----------------------|
-| `rdhaibi`   | Administrator  | rdhaibi@student.42.fr | Full site management |
+| `login`   | Administrator  | login@student.42.fr | Full site management |
 | `wpregular` | 	Author       | wpuser@student.42.fr  |   Content creation   |
 |_____________|________________|_______________________|______________________|
 
@@ -168,13 +168,13 @@ cat secrets/db_root_password.txt
 Key configuration variables in `srcs/.env`:
 
 ```bash
-DOMAIN_NAME=rdhaibi.42.fr              # Website domain
-MYSQL_ROOT_PASSWORD=BananaMARIA        # Database root password
+DOMAIN_NAME=login.42.fr              # Website domain
+MYSQL_ROOT_PASSWORD=PswrdMARIA        # Database root password
 MYSQL_DATABASE=wordpress_db            # Database name
 MYSQL_USER=wordpress                   # Database user
-MYSQL_PASSWORD=Banana                  # Database password
-WP_ADMIN_USER=rdhaibi                  # WordPress admin username
-WP_ADMIN_PASSWORD=BananaWP             # WordPress admin password
+MYSQL_PASSWORD=Pswrd                  # Database password
+WP_ADMIN_USER=login                  # WordPress admin username
+WP_ADMIN_PASSWORD=PswrdWP             # WordPress admin password
 WP_USER=wpregular                      # Regular user username
 WP_USER_PASSWORD=RegularUser123        # Regular user password
 ```
@@ -241,14 +241,14 @@ docker logs -f wordpress
 
 **Test NGINX**:
 ```bash
-curl -k https://rdhaibi.42.fr
+curl -k https://login.42.fr
 ```
 
 Should return HTML content.
 
 **Test MariaDB from WordPress container**:
 ```bash
-docker exec wordpress mysql -hmariadb -uwordpress -pBanana -e "SHOW DATABASES;"
+docker exec wordpress mysql -hmariadb -uwordpress -pPswrd -e "SHOW DATABASES;"
 ```
 
 Should show the WordPress database.
@@ -268,8 +268,8 @@ docker volume ls
 
 **Check data on host**:
 ```bash
-ls -lh /home/rdhaibi/data/mariadb/
-ls -lh /home/rdhaibi/data/wordpress/
+ls -lh /home/login/data/mariadb/
+ls -lh /home/login/data/wordpress/
 ```
 
 Both directories should contain files.
@@ -322,9 +322,9 @@ Both directories should contain files.
 
 3. Verify domain in `/etc/hosts`:
    ```bash
-   grep rdhaibi.42.fr /etc/hosts
+   grep login.42.fr /etc/hosts
    ```
-   Should show: `127.0.0.1    rdhaibi.42.fr`
+   Should show: `127.0.0.1    login.42.fr`
 
 4. Try accessing via IP:
    ```bash
@@ -353,7 +353,7 @@ Both directories should contain files.
 
 2. Check host data directories:
    ```bash
-   ls -la /home/rdhaibi/data/wordpress/
+   ls -la /home/login/data/wordpress/
    ```
 
 3. Verify volume mounts in containers:
@@ -379,7 +379,7 @@ Both directories should contain files.
 
 3. Test database connection:
    ```bash
-   docker exec wordpress mysql -hmariadb -uwordpress -pBanana -e "SELECT 1"
+   docker exec wordpress mysql -hmariadb -uwordpress -pPswrd -e "SELECT 1"
    ```
 
 4. Check MariaDB logs:
@@ -432,8 +432,8 @@ If you encounter issues not covered here:
 | Full cleanup   | `make fclean`                    |
 | Rebuild        | `make re`                        |
 | Check status   | `docker ps`                      |
-| Test website   | `curl -k https://rdhaibi.42.fr`  |
-| Access admin   | `https://rdhaibi.42.fr/wp-admin` |
+| Test website   | `curl -k https://login.42.fr`  |
+| Access admin   | `https://login.42.fr/wp-admin` |
 |________________|__________________________________|
 
 **For development and technical details, see [DEV_DOC.md](DEV_DOC.md).**

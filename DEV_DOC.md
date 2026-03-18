@@ -31,7 +31,7 @@ curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/doc
 apt-get update && apt-get install -y docker-compose docker-ce docker-ce-cli containerd.io docker-compose-plugin docker-buildx-plugin
 sudo curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose && sudo chmod +x /usr/local/bin/docker-compose
 sudo sh get-docker.sh
-sudo usermod -aG docker rdhaibi
+sudo usermod -aG docker login
 
 # Verify installations
 docker --version
@@ -56,9 +56,9 @@ Create credential files in the `secrets/` directory:
 ```bash
 # These files should NOT be committed to git
 mkdir -p /secrets
-echo "Banana" > /secrets/db_password.txt
-echo "BananaMARIA" > /secrets/db_root_password.txt
-printf "WP_ADMIN_PASSWORD=BananaWP\nWP_USER_PASSWORD=RegularUser123\n" > ~/secrets/credentials.txt
+echo "Pswrd" > /secrets/db_password.txt
+echo "PswrdMARIA" > /secrets/db_root_password.txt
+printf "WP_ADMIN_PASSWORD=PswrdWP\nWP_USER_PASSWORD=RegularUser123\n" > ~/secrets/credentials.txt
 
 # Set appropriate permissions
 chmod 600 secrets/*
@@ -70,11 +70,11 @@ Edit `srcs/.env` with your configuration:
 
 ```bash
 cat > /srcs/.env << 'EOF'
-DOMAIN_NAME=rdhaibi.42.fr
+DOMAIN_NAME=login.42.fr
 MYSQL_DATABASE=wordpress_db
 MYSQL_USER=wordpress
-WP_ADMIN_USER=rdhaibi
-WP_ADMIN_EMAIL=rdhaibi@student.42.fr
+WP_ADMIN_USER=login
+WP_ADMIN_EMAIL=login@student.42.fr
 WP_DB_HOST=mariadb
 WP_DB_NAME=wordpress_db
 WP_DB_USER=wordpress
@@ -99,7 +99,7 @@ EOF
 Add domain to `/etc/hosts`:
 
 ```bash
-sudo sh -c 'echo "127.0.0.1    rdhaibi.42.fr" >> /etc/hosts'
+sudo sh -c 'echo "127.0.0.1    login.42.fr" >> /etc/hosts'
 ```
 
 ## Project Architecture
@@ -124,7 +124,7 @@ sudo sh -c 'echo "127.0.0.1    rdhaibi.42.fr" >> /etc/hosts'
 │    │	443    │   │  volume  │  │  volume  │     │
 │    └─────────┘   └──────────┘  └──────────┘     │
 │                        ↓             ↓          │
-│                  /home/rdhaibi/data/            │
+│                  /home/login/data/            │
 └─────────────────────────────────────────────────┘
 ```
 
@@ -136,7 +136,7 @@ sudo sh -c 'echo "127.0.0.1    rdhaibi.42.fr" >> /etc/hosts'
 
 ### Data Flow
 
-1. User requests `https://rdhaibi.42.fr` (port 443)
+1. User requests `https://login.42.fr` (port 443)
 2. NGINX receives request, terminates TLS
 3. NGINX forwards to WordPress via FastCGI (port 9000)
 4. WordPress processes request, queries MariaDB if needed
@@ -273,7 +273,7 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /home/rdhaibi/data/mariadb
+      device: /home/login/data/mariadb
 ```
 
 This provides:
@@ -292,12 +292,12 @@ docker volume inspect srcs_mariadb_data
 docker volume inspect srcs_wordpress_data
 
 # Check data on host
-ls -lah /home/rdhaibi/data/mariadb/
-ls -lah /home/rdhaibi/data/wordpress/
+ls -lah /home/login/data/mariadb/
+ls -lah /home/login/data/wordpress/
 
 # Backup volumes
-sudo tar -czf mariadb_backup.tar.gz /home/rdhaibi/data/mariadb/
-sudo tar -czf wordpress_backup.tar.gz /home/rdhaibi/data/wordpress/
+sudo tar -czf mariadb_backup.tar.gz /home/login/data/mariadb/
+sudo tar -czf wordpress_backup.tar.gz /home/login/data/wordpress/
 
 # Volume paths
 docker volume inspect $(docker volume ls -q -f name=mariadb)
@@ -312,8 +312,8 @@ sudo tar -xzf wordpress_backup.tar.gz -C /
 
 ```bash
 # Check ownership
-ls -ld /home/rdhaibi/data/mariadb/
-ls -ld /home/rdhaibi/data/wordpress/
+ls -ld /home/login/data/mariadb/
+ls -ld /home/login/data/wordpress/
 
 ```
 
@@ -333,7 +333,7 @@ docker exec wordpress nslookup mariadb
 docker exec nginx nslookup wordpress
 
 # Check TLS version
-echo | openssl s_client -connect rdhaibi.42.fr:443 2>/dev/null | grep -E "Protocol|TLS"
+echo | openssl s_client -connect login.42.fr:443 2>/dev/null | grep -E "Protocol|TLS"
 ```
 
 ### Inter-Container Communication
@@ -403,10 +403,10 @@ docker exec mariadb mysqld --help --verbose | grep -A 1 "Default options"
 docker exec mariadb mysql -u root -e "SELECT 1"
 
 # User login with password SUCCEEDS
-docker exec mariadb mysql -u wordpress -pBanana -h 127.0.0.1 wordpress_db -e "SHOW TABLES;"
+docker exec mariadb mysql -u wordpress -pPswrd -h 127.0.0.1 wordpress_db -e "SHOW TABLES;"
 
 # Login as root WITH password to check what users exist
-docker exec mariadb mysql -u root -p'BananaMARIA' -e "SELECT user,host FROM mysql.user;"
+docker exec mariadb mysql -u root -p'PswrdMARIA' -e "SELECT user,host FROM mysql.user;"
 
 ```
 
@@ -525,7 +525,7 @@ docker exec wordpress env | grep -E 'WP_DB|MYSQL'
 docker exec mariadb env | grep MYSQL
 
 # Test connection manually
-docker exec wordpress mysql -hmariadb -uwordpress -pBanana wordpress_db -e "SELECT VERSION();"
+docker exec wordpress mysql -hmariadb -uwordpress -pPswrd wordpress_db -e "SELECT VERSION();"
 ```
 
 #### Permission Denied Errors
@@ -536,7 +536,7 @@ docker exec wordpress ls -la /var/www/html
 docker exec mariadb ls -la /var/lib/mysql
 
 # Check host directories
-ls -la /home/rdhaibi/data/
+ls -la /home/login/data/
 
 # Fix if needed (example for WordPress)
 docker exec wordpress chown -R www-data:www-data /var/www/html
@@ -555,7 +555,7 @@ docker exec nginx openssl x509 -in /etc/nginx/certs/server.crt -text -noout
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
     -keyout srcs/requirements/nginx/tools/certs/server.key \
     -out srcs/requirements/nginx/tools/certs/server.crt \
-    -subj "/C=FR/ST=Paris/L=Paris/O=42/OU=42/CN=rdhaibi.42.fr"
+    -subj "/C=FR/ST=Paris/L=Paris/O=42/OU=42/CN=login.42.fr"
 ```
 
 ### Advanced Debugging

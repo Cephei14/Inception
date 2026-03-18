@@ -1,6 +1,6 @@
 # Inception
 
-*This project has been created as part of the 42 curriculum by rdhaibi.*
+*This project has been created as part of the 42 curriculum by login.*
 
 ## Description
 
@@ -34,7 +34,7 @@ Before running the project, configure your domain name to point to localhost:
 
 2. Add the following line:
    ```
-   127.0.0.1    rdhaibi.42.fr
+   127.0.0.1    login.42.fr
    ```
 
 ### Installation & Execution
@@ -47,11 +47,11 @@ Before running the project, configure your domain name to point to localhost:
    
 2. **Copy the repository to the VM**:
    ```bash
-   scp -P 2222 -r /home/rdhaibi/Inception rdhaibi@localhost:/home/rdhaibi/Desktop
+   scp -P 2222 -r /home/login/Inception login@localhost:/home/login/Desktop
    ```
    This command assumes your VM is configured with NAT and port forwarding (host port 2222 → guest port 22), general rule :
    ```bash
-   scp -r <Path of repository> rdhaibi@<VM_IP>:<destination>
+   scp -r <Path of repository> login@<VM_IP>:<destination>
    ```
    Replace `<VM_IP>` with the IP address shown by `hostname -I` in your VM. Adjust the username and paths as needed for your environment.
 
@@ -68,8 +68,8 @@ Before running the project, configure your domain name to point to localhost:
    ls secrets/
    # Should show: credentials.txt, db_password.txt, db_root_password.txt
    chmod 600 secrets/*
-   chown -R $(whoami):$(whoami) /home/rdhaibi/data
-   chmod 700 /home/rdhaibi/data/mariadb /home/rdhaibi/data/wordpress
+   chown -R $(whoami):$(whoami) /home/login/data
+   chmod 700 /home/login/data/mariadb /home/login/data/wordpress
    cd srcs
    cat > .env << 'EOF'
    DOMAIN_NAME=login.42.fr
@@ -94,7 +94,7 @@ Before running the project, configure your domain name to point to localhost:
    ```
 
 5. **Access the website**:
-   - Open your browser and navigate to: `https://rdhaibi.42.fr`
+   - Open your browser and navigate to: `https://login.42.fr`
    - Accept the self-signed certificate warning
    - WordPress should be accessible
 
@@ -221,7 +221,7 @@ This project uses Docker to containerize three main services: NGINX, WordPress, 
 | **Backup**      | Docker tools available 					    | Manual/standard tools 		  |
 | **Best For**    | Production, persistence 				       | Development, sharing files   |
 
-**Implementation**: This project uses **named volumes with driver options** to store data in `/home/rdhaibi/data/` as required, combining the benefits of Docker volume management with specific host locations.
+**Implementation**: This project uses **named volumes with driver options** to store data in `/home/login/data/` as required, combining the benefits of Docker volume management with specific host locations.
 
 ## Project Structure
 
