@@ -62,9 +62,9 @@ Before running the project, configure your domain name to point to localhost:
    mkdir -p secrets
    sudo chown -R $(whoami):$(whoami) secrets
    chmod 700 secrets
-   echo "Banana" > secrets/db_password.txt
-   echo "BananaMARIA" > secrets/db_root_password.txt
-   printf "WP_ADMIN_PASSWORD=BananaWP\nWP_USER_PASSWORD=RegularUser123\n" > secrets/credentials.txt
+   echo "_Passwrd" > secrets/db_password.txt
+   echo "Root_Passwrd" > secrets/db_root_password.txt
+   printf "WP_ADMIN_PASSWORDWP_Passwrd\nWP_USER_PASSWORD=UserPasswrd\n" > secrets/credentials.txt
    ls secrets/
    # Should show: credentials.txt, db_password.txt, db_root_password.txt
    chmod 600 secrets/*
@@ -72,11 +72,11 @@ Before running the project, configure your domain name to point to localhost:
    chmod 700 /home/rdhaibi/data/mariadb /home/rdhaibi/data/wordpress
    cd srcs
    cat > .env << 'EOF'
-   DOMAIN_NAME=rdhaibi.42.fr
+   DOMAIN_NAME=login.42.fr
    MYSQL_DATABASE=wordpress_db
    MYSQL_USER=wordpress
-   WP_ADMIN_USER=rdhaibi
-   WP_ADMIN_EMAIL=rdhaibi@student.42.fr
+   WP_ADMIN_USER=login
+   WP_ADMIN_EMAIL=login@student.42.fr
    WP_DB_HOST=mariadb
    WP_DB_NAME=wordpress_db
    WP_DB_USER=wordpress
@@ -181,7 +181,6 @@ This project uses Docker to containerize three main services: NGINX, WordPress, 
 | **Isolation**      | Complete (hardware-level)   		| Process-level 				       |
 | **Portability**    | Lower (platform-dependent)        | Higher (runs anywhere)  	  	    |
 | **Use Case**       | Full OS testing, strong isolation | Microservices, rapid deployment |
-|____________________|___________________________________|_________________________________|
 
 **Choice for this project**: Docker containers are ideal because we need lightweight, portable, and easily reproducible services that can start quickly and use resources efficiently.
 
@@ -194,7 +193,6 @@ This project uses Docker to containerize three main services: NGINX, WordPress, 
 | **Storage**      | Encrypted in Swarm/separate files | In memory, process env      |
 | **Best For**     | Passwords, API keys, certs        | Non-sensitive config        |
 | **This Project** | Could use for passwords           | Used for general config     |
-|__________________|___________________________________|_____________________________|
 
 **Implementation**: This project uses environment variables from `.env` file for general configuration and separate `secrets/` folder for sensitive credentials (kept out of git).
 
@@ -209,7 +207,6 @@ This project uses Docker to containerize three main services: NGINX, WordPress, 
 | **DNS**          | Built-in service discovery 	 | Requires external DNS 	   |
 | **Performance**  | Slight overhead (NAT) 			 | No overhead 				   |
 | **Use Case**     | Microservices, security 		 | High performance needs 	   |
-|__________________|________________________________|____________________________|
 
 **Choice for this project**: A custom bridge network (`inception_network`) allows containers to communicate with each other by name and provides network isolation between containers. Host access to services (like HTTPS and SSH) is enabled only through explicit port forwarding (e.g., 4443→443 for HTTPS, 2222→22 for SSH) using NAT. This setup is secure and flexible for a multi-service environment, exposing only selected ports to the host.
 
@@ -223,7 +220,6 @@ This project uses Docker to containerize three main services: NGINX, WordPress, 
 | **Permissions** | Docker handles 							       | Host filesystem permissions  |
 | **Backup**      | Docker tools available 					    | Manual/standard tools 		  |
 | **Best For**    | Production, persistence 				       | Development, sharing files   |
-|_________________|__________________________________________|______________________________|
 
 **Implementation**: This project uses **named volumes with driver options** to store data in `/home/rdhaibi/data/` as required, combining the benefits of Docker volume management with specific host locations.
 
